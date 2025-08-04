@@ -32,7 +32,7 @@ namespace wfaCRUD
         {
             try
             {
-                objCnx.ConnectionString = "Server=localhost;Database=bdaula;user=root;pwd=root";
+                objCnx.ConnectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
                 objCnx.Open();
             }
             catch (Exception erro)

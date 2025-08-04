@@ -27,7 +27,7 @@ namespace wfaCRUD
         {
             try
             {
-                objConexao.ConnectionString = "Server=localhost;Database=bdaula;user=root;password=root";
+                objConexao.ConnectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
                 objConexao.Open();
             }
             catch (Exception erro)
@@ -146,6 +146,7 @@ namespace wfaCRUD
             txtEmail.Text = "";
             txtTelefone.Text = "";
             txtCPF.Text = "";
+            textBox1.Text = "";
             txtCodigo.Focus();
         }
 
