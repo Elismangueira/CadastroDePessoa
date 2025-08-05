@@ -143,7 +143,6 @@ namespace wfaCRUD
             txtNome.Text = "";
             txtEmail.Text = "";
             txtTelefone.Text = "";
-            txtCPF.Text = "";
             textBox1.Text = "";
             txtCodigo.Focus();
         }
