@@ -39,7 +39,7 @@ namespace wfaCRUD
                     strSQL += "'" + txtNome.Text + "',";
                     strSQL += "'" + txtEmail.Text + "',";
                     strSQL += "'" + txtTelefone.Text + "',";
-                    strSQL += "'" + txtCPF.Text + "')";
+                    strSQL += "'" + textBox1.Text + "')";
 
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
