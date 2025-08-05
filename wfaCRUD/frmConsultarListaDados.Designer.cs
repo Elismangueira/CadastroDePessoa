@@ -115,7 +115,6 @@
             this.Controls.Add(this.btnVoltar);
             this.Name = "frmConsultarListaDados";
             this.Text = "Consultar Lista de Dados";
-            this.Load += new System.EventHandler(this.frmConsultarListaDados_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvListaDados)).EndInit();
             this.ResumeLayout(false);
 

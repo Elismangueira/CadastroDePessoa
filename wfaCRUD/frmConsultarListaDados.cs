@@ -13,9 +13,7 @@ namespace wfaCRUD
 {
     public partial class frmConsultarListaDados : Form
     {
-        public MySqlConnection objCnx = new MySqlConnection();
-        public MySqlCommand objCmd = new MySqlCommand();
-        public MySqlDataReader objDados;
+        string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
 
         public frmConsultarListaDados()
         {
@@ -24,47 +22,40 @@ namespace wfaCRUD
 
         private void btnVoltar_Click(object sender, EventArgs e)
         {
-            objCnx.Close();
             Close();
-        }
-
-        private void frmConsultarListaDados_Load(object sender, EventArgs e)
-        {
-            try
-            {
-                objCnx.ConnectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
-                objCnx.Open();
-            }
-            catch (Exception erro)
-            {
-                MessageBox.Show(erro.Message, "Erro na conexão com o BD!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
-                string strSQL = "select * from tblagenda order by agdnome";
-
-                objCmd.Connection = objCnx;
-                objCmd.CommandText = strSQL;
-                objDados = objCmd.ExecuteReader();
-
-                if (objDados.HasRows)
+                using (var objConexao = new MySqlConnection(connectionString))
                 {
-                    dgvListaDados.Rows.Clear();
+                    objConexao.Open();
 
-                    while (objDados.Read())
+                    string strSQL = "select * from tblagenda order by agdnome";
+
+                    using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
-                        dgvListaDados.Rows.Add(objDados["agdid"].ToString(), objDados["agdcpf"].ToString(), objDados["agdnome"].ToString(), objDados["agdemail"].ToString(), objDados["agdtelefone"].ToString());
+                        var objDados = objCommand.ExecuteReader();
+
+                        if (objDados.HasRows)
+                        {
+                            dgvListaDados.Rows.Clear();
+
+                            while (objDados.Read())
+                            {
+                                dgvListaDados.Rows.Add(objDados["agdid"].ToString(), objDados["agdcpf"].ToString(), objDados["agdnome"].ToString(), objDados["agdemail"].ToString(), objDados["agdtelefone"].ToString());
+                            }
+                        }
+
+                        MessageBox.Show("Registrado com sucesso!");
                     }
                 }
-
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                MessageBox.Show(erro.Message, "Erro ao consultar", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

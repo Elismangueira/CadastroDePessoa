@@ -240,7 +240,6 @@
             this.Controls.Add(this.label1);
             this.Name = "frmBancoDados";
             this.Text = "Banco de Dados";
-            this.Load += new System.EventHandler(this.frmBancoDados_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

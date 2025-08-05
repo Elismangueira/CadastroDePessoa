@@ -1,45 +1,29 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace wfaCRUD
 {
     public partial class frmBancoDados : Form
     {
-        public MySqlConnection objConexao = new MySqlConnection();
-        public MySqlCommand objCommand = new MySqlCommand();
-        public MySqlDataReader objDados;
-
+        string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
 
         public frmBancoDados()
         {
             InitializeComponent();
         }
 
-        private void frmBancoDados_Load(object sender, EventArgs e)
-        {
-            try
-            {
-                objConexao.ConnectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
-                objConexao.Open();
-            }
-            catch (Exception erro)
-            {
-                MessageBox.Show(erro.Message, "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                objConexao.Close();
-            }
-        }
-
         private void btnSair_Click(object sender, EventArgs e)
         {
-            objConexao.Close();
             Application.Exit();
         }
 
@@ -47,55 +31,64 @@ namespace wfaCRUD
         {
             try
             {
-                string strSQL = "insert into tblagenda(agdid, agdnome, agdemail, agdtelefone, agdcpf) values(NULL,";
-                strSQL += "'" + txtNome.Text + "',";
-                strSQL += "'" + txtEmail.Text + "',";
-                strSQL += "'" + txtTelefone.Text + "',";
-                strSQL += "'" + txtCPF.Text + "')";
+                using (var objConexao = new MySqlConnection(connectionString))
+                {
+                    objConexao.Open();
 
+                    string strSQL = "insert into tblagenda(agdid, agdnome, agdemail, agdtelefone, agdcpf) values(NULL,";
+                    strSQL += "'" + txtNome.Text + "',";
+                    strSQL += "'" + txtEmail.Text + "',";
+                    strSQL += "'" + txtTelefone.Text + "',";
+                    strSQL += "'" + txtCPF.Text + "')";
 
-                objCommand.Connection = objConexao;
-                objCommand.CommandText = strSQL;
-                objCommand.ExecuteNonQuery();
-
-                MessageBox.Show("Registrado com sucesso!");
+                    using (var objCommand = new MySqlCommand(strSQL, objConexao))
+                    {
+                        objCommand.ExecuteNonQuery();
+                        MessageBox.Show("Registrado com sucesso!");
+                    }
+                }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao inserir");
+                MessageBox.Show(erro.Message, "Erro ao inserir", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
         }
 
         private void btnConsultar_Click(object sender, EventArgs e)
         {
             try
             {
-                string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
-
-                objCommand.Connection = objConexao;
-                objCommand.CommandText = strSQL;
-                objDados = objCommand.ExecuteReader();
-
-                if (!objDados.HasRows)
+                using (var objConexao = new MySqlConnection(connectionString))
                 {
-                    MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    txtCodigo.Focus();
-                }
-                else
-                {
-                    objDados.Read();
-                    txtNome.Text = objDados["agdnome"].ToString();
-                    txtEmail.Text = objDados["agdemail"].ToString();
-                    txtTelefone.Text = objDados["agdtelefone"].ToString();
-                    textBox1.Text = objDados["agdcpf"].ToString();
-                }
+                    objConexao.Open();
 
-                if (!objDados.IsClosed) { objDados.Close(); }
+                    string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
+
+                    using (var objCommand = new MySqlCommand(strSQL, objConexao))
+                    {
+                        var objDados = objCommand.ExecuteReader();
+
+                        if (!objDados.HasRows)
+                        {
+                            MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            txtCodigo.Focus();
+                        }
+                        else
+                        {
+                            objDados.Read();
+                            txtNome.Text = objDados["agdnome"].ToString();
+                            txtEmail.Text = objDados["agdemail"].ToString();
+                            txtTelefone.Text = objDados["agdtelefone"].ToString();
+                            textBox1.Text = objDados["agdcpf"].ToString();
+                        }
+
+                        MessageBox.Show("Registrado com sucesso!");
+                    }
+                }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(erro.Message, "Erro ao consultar", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -103,40 +96,45 @@ namespace wfaCRUD
         {
             try
             {
-                string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
-
-                objCommand.Connection = objConexao;
-                objCommand.CommandText = strSQL;
-                objDados = objCommand.ExecuteReader();
-
-                if (!objDados.HasRows)
+                using (var objConexao = new MySqlConnection(connectionString))
                 {
-                    MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    txtCodigo.Focus();
-                }
-                else
-                {
-                    if (!objDados.IsClosed) { objDados.Close(); }
+                    objConexao.Open();
 
-                    strSQL = "update tblagenda  set ";
-                    strSQL += "agdnome = '" + txtNome.Text + "',";
-                    strSQL += "agdemail = '" + txtEmail.Text + "',";
-                    strSQL += "agdtelefone = '" + txtTelefone.Text + "',";
-                    strSQL += "agdcpf = '" + txtCPF.Text + "'";
-                    strSQL += "where agdid = " + txtCodigo.Text.Trim();
+                    string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
 
-                    objCommand.Connection = objConexao;
-                    objCommand.CommandText = strSQL;
-                    objCommand.ExecuteNonQuery();
+                    using (var objCommand = new MySqlCommand(strSQL, objConexao))
+                    {
+                        var objDados = objCommand.ExecuteReader();
 
-                    MessageBox.Show("Registro alterado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (!objDados.HasRows)
+                        {
+                            MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            txtCodigo.Focus();
+                        }
+                        else
+                        {
+                            if (!objDados.IsClosed) { objDados.Close(); }
+
+                            strSQL = "update tblagenda  set ";
+                            strSQL += "agdnome = '" + txtNome.Text + "',";
+                            strSQL += "agdemail = '" + txtEmail.Text + "',";
+                            strSQL += "agdtelefone = '" + txtTelefone.Text + "',";
+                            strSQL += "agdcpf = '" + txtCPF.Text + "'";
+                            strSQL += "where agdid = " + txtCodigo.Text.Trim();
+
+                            objCommand.Connection = objConexao;
+                            objCommand.CommandText = strSQL;
+                            objCommand.ExecuteNonQuery();
+
+                            MessageBox.Show("Registro alterado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show("Erro na alteração do registro!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(erro.Message, "Erro ao alterar", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-           
         }
 
         private void btnLimpar_Click(object sender, EventArgs e)
@@ -154,21 +152,28 @@ namespace wfaCRUD
         {
             try
             {
-                if (MessageBox.Show("Excluir o código selecionado", "Banco de Dados", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                using (var objConexao = new MySqlConnection(connectionString))
                 {
+                    objConexao.Open();
+
                     string strSQL = "delete from tblagenda where agdid =" + txtCodigo.Text.Trim();
 
-                    objCommand.Connection = objConexao;
-                    objCommand.CommandText = strSQL;
-                    objCommand.ExecuteNonQuery();
+                    using (var objCommand = new MySqlCommand(strSQL, objConexao))
+                    {
+                        objCommand.ExecuteNonQuery();
 
-                    MessageBox.Show("Registro eliminado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        if (MessageBox.Show("Excluir o código selecionado", "Banco de Dados", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                        {
+                            objCommand.ExecuteNonQuery();
+
+                            MessageBox.Show("Registro eliminado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
                 }
             }
-
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro ao excluir", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
