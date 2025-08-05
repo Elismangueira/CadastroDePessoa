@@ -88,7 +88,7 @@ namespace wfaCRUD
                     txtNome.Text = objDados["agdnome"].ToString();
                     txtEmail.Text = objDados["agdemail"].ToString();
                     txtTelefone.Text = objDados["agdtelefone"].ToString();
-                    txtCPF.Text = objDados["agdcpf"].ToString();
+                    textBox1.Text = objDados["agdcpf"].ToString();
                 }
 
                 if (!objDados.IsClosed) { objDados.Close(); }
