@@ -15,7 +15,8 @@ namespace wfaCRUD
 {
     public partial class frmBancoDados : Form
     {
-        string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
+        //string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
+        string connectionString = "Server=sql10.freesqldatabase.com;Database=sql10793804;user=sql10793804;password=Kk5pZ7ZIDE";
 
         public frmBancoDados()
         {
