@@ -15,8 +15,8 @@ namespace wfaCRUD
 {
     public partial class frmBancoDados : Form
     {
-        //string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
-        string connectionString = "Server=sql10.freesqldatabase.com;Database=sql10793804;user=sql10793804;password=Kk5pZ7ZIDE";
+        string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
+        //string connectionString = "Server=sql111.infinityfree.com;Database=f0_39700899_cadastrodepessoa;user=if0_39700899;password=0URz1EHbRGhx";
 
         public frmBancoDados()
         {
@@ -28,8 +28,41 @@ namespace wfaCRUD
             Application.Exit();
         }
 
+        private bool ValidarCamposDeDados()
+        {
+            if (String.IsNullOrEmpty(txtNome.Text))
+            {
+                MessageBox.Show("Campo nome deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+                
+
+            if (String.IsNullOrEmpty(txtEmail.Text))
+            {
+                MessageBox.Show("Campo email deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+
+            if (String.IsNullOrEmpty(txtTelefone.Text))
+            {
+                MessageBox.Show("Campo telefone deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+
+            if (String.IsNullOrEmpty(textBox1.Text))
+            {
+                MessageBox.Show("Campo cpf deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+
+            return true;
+        }
+
         private void btnInserir_Click(object sender, EventArgs e)
         {
+            if (!ValidarCamposDeDados())
+                return;
+
             try
             {
                 using (var objConexao = new MySqlConnection(connectionString))
