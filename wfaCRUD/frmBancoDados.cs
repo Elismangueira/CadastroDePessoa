@@ -96,7 +96,22 @@ namespace wfaCRUD
                 {
                     objConexao.Open();
 
-                    string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
+                    var campoPreenchidoId = !String.IsNullOrEmpty(txtCodigo.Text.Trim());
+                    var campoPreenchidoCpf = !String.IsNullOrEmpty(textBox1.Text.Trim());
+
+                    var campoId = "agdid = " + txtCodigo.Text.Trim();
+                    var campoCpf = "agdcpf = " + textBox1.Text.Trim();
+
+                    string strSQL = "select * from tblagenda where ";
+
+                    if (campoPreenchidoId)
+                        strSQL += campoId;
+
+                    if (campoPreenchidoCpf && !campoPreenchidoId)
+                        strSQL += campoCpf;
+
+                    if (campoPreenchidoCpf && campoPreenchidoId)
+                        strSQL += " AND " + campoCpf;
 
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
