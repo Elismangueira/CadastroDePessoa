@@ -28,6 +28,7 @@ namespace wfaCRUD
             Application.Exit();
         }
 
+
         private bool ValidarCamposDeDados()
         {
             if (String.IsNullOrEmpty(txtNome.Text))
@@ -35,11 +36,16 @@ namespace wfaCRUD
                 MessageBox.Show("Campo nome deve ser preenchido!!!", "Validação de dados");
                 return false;
             }
-                
 
             if (String.IsNullOrEmpty(txtEmail.Text))
             {
                 MessageBox.Show("Campo email deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+
+            if (!Validar.IsValidEmail(txtEmail.Text))
+            {
+                MessageBox.Show("Campo email inválido!!!", "Validação de dados");
                 return false;
             }
 
@@ -52,6 +58,12 @@ namespace wfaCRUD
             if (String.IsNullOrEmpty(textBox1.Text))
             {
                 MessageBox.Show("Campo cpf deve ser preenchido!!!", "Validação de dados");
+                return false;
+            }
+
+            if (!Validar.IsValidCpf(textBox1.Text))
+            {
+                MessageBox.Show("Campo cpf inválido!!!", "Validação de dados");
                 return false;
             }
 
