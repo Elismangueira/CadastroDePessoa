@@ -14,11 +14,25 @@ namespace wfaCRUD
 {
     public partial class frmConsultarListaDados : Form
     {
-        string connectionString = ConfigurationManager.AppSettings["DatabaseConnectionString"].ToString();
+        string connectionString = String.Empty;
 
         public frmConsultarListaDados()
         {
             InitializeComponent();
+            connectionString = ConfigurationManager.AppSettings["DatabaseConnectionString"];
+
+            try
+            {
+                if (String.IsNullOrEmpty(connectionString))
+                {
+                    throw new Exception("String de conexão não encontrada./n/nA aplicação será fechada.");
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Erro de configuração.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
+            }
         }
 
         private void btnVoltar_Click(object sender, EventArgs e)
@@ -34,7 +48,7 @@ namespace wfaCRUD
                 {
                     objConexao.Open();
 
-                    string strSQL = "select * from tblagenda order by agdnome";
+                    string strSQL = "select * from bdaula.tblagenda order by agdnome";
 
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
@@ -50,13 +64,13 @@ namespace wfaCRUD
                             }
                         }
 
-                        MessageBox.Show("Registrado com sucesso!");
+                        MessageBox.Show("Registro carregado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao consultar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Mysqlx;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,11 +17,25 @@ namespace wfaCRUD
 {
     public partial class frmBancoDados : Form
     {
-        string connectionString = ConfigurationManager.AppSettings["DatabaseConnectionString"];
+        string connectionString = String.Empty;
 
         public frmBancoDados()
         {
             InitializeComponent();
+            connectionString = ConfigurationManager.AppSettings["DatabaseConnectionString"];
+
+            try
+            {
+                if (String.IsNullOrEmpty(connectionString))
+                {
+                    throw new Exception("String de conexão não encontrada./n/nA aplicação será fechada.");
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Erro de configuração.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
+            }
         }
 
         private void btnSair_Click(object sender, EventArgs e)
@@ -33,37 +48,37 @@ namespace wfaCRUD
         {
             if (String.IsNullOrEmpty(txtNome.Text))
             {
-                MessageBox.Show("Campo nome deve ser preenchido!!!", "Validação de dados");
+                MessageBox.Show("Campo nome deve ser preenchido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             if (String.IsNullOrEmpty(txtEmail.Text))
             {
-                MessageBox.Show("Campo email deve ser preenchido!!!", "Validação de dados");
+                MessageBox.Show("Campo email deve ser preenchido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             if (!Validar.IsValidEmail(txtEmail.Text))
             {
-                MessageBox.Show("Campo email inválido!!!", "Validação de dados");
+                MessageBox.Show("Campo email inválido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             if (String.IsNullOrEmpty(txtTelefone.Text))
             {
-                MessageBox.Show("Campo telefone deve ser preenchido!!!", "Validação de dados");
+                MessageBox.Show("Campo telefone deve ser preenchido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             if (String.IsNullOrEmpty(textBox1.Text))
             {
-                MessageBox.Show("Campo cpf deve ser preenchido!!!", "Validação de dados");
+                MessageBox.Show("Campo cpf deve ser preenchido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             if (!Validar.IsValidCpf(textBox1.Text))
             {
-                MessageBox.Show("Campo cpf inválido!!!", "Validação de dados");
+                MessageBox.Show("Campo cpf inválido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -75,13 +90,20 @@ namespace wfaCRUD
             if (!ValidarCamposDeDados())
                 return;
 
+            if (Validar.IsUserExists(txtCodigo.Text, textBox1.Text))
+            {
+                MessageBox.Show("Usuário já existe no sistema.", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+                
+
             try
             {
                 using (var objConexao = new MySqlConnection(connectionString))
                 {
                     objConexao.Open();
 
-                    string strSQL = "insert into tblagenda(agdid, agdnome, agdemail, agdtelefone, agdcpf) values(NULL,";
+                    string strSQL = "insert into bdaula.tblagenda(agdid, agdnome, agdemail, agdtelefone, agdcpf) values(NULL,";
                     strSQL += "'" + txtNome.Text + "',";
                     strSQL += "'" + txtEmail.Text + "',";
                     strSQL += "'" + txtTelefone.Text + "',";
@@ -90,13 +112,13 @@ namespace wfaCRUD
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
                         objCommand.ExecuteNonQuery();
-                        MessageBox.Show("Registrado com sucesso!");
+                        MessageBox.Show("Registrado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao inserir", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -112,9 +134,9 @@ namespace wfaCRUD
                     var campoPreenchidoCpf = !String.IsNullOrEmpty(textBox1.Text.Trim());
 
                     var campoId = "agdid = " + txtCodigo.Text.Trim();
-                    var campoCpf = "agdcpf = " + textBox1.Text.Trim();
+                    var campoCpf = "agdcpf = '" + textBox1.Text.Trim() + "'";
 
-                    string strSQL = "select * from tblagenda where ";
+                    string strSQL = "select * from bdaula.tblagenda where ";
 
                     if (campoPreenchidoId)
                         strSQL += campoId;
@@ -131,7 +153,7 @@ namespace wfaCRUD
 
                         if (!objDados.HasRows)
                         {
-                            MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Registro não encontrado!", "Validação", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             txtCodigo.Focus();
                         }
                         else
@@ -143,13 +165,13 @@ namespace wfaCRUD
                             textBox1.Text = objDados["agdcpf"].ToString();
                         }
 
-                        MessageBox.Show("Registrado com sucesso!");
+                        MessageBox.Show("Registro carregado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao consultar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -161,7 +183,23 @@ namespace wfaCRUD
                 {
                     objConexao.Open();
 
-                    string strSQL = "select * from tblagenda where agdid = " + txtCodigo.Text.Trim();
+
+                    var campoPreenchidoId = !String.IsNullOrEmpty(txtCodigo.Text.Trim());
+                    var campoPreenchidoCpf = !String.IsNullOrEmpty(textBox1.Text.Trim());
+
+                    var campoId = "agdid = " + txtCodigo.Text.Trim();
+                    var campoCpf = "agdcpf = '" + textBox1.Text.Trim() + "'";
+
+                    string strSQL = "select * from bdaula.tblagenda where ";
+
+                    if (campoPreenchidoId)
+                        strSQL += campoId;
+
+                    if (campoPreenchidoCpf && !campoPreenchidoId)
+                        strSQL += campoCpf;
+
+                    if (campoPreenchidoCpf && campoPreenchidoId)
+                        strSQL += " AND " + campoCpf;
 
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
@@ -169,7 +207,7 @@ namespace wfaCRUD
 
                         if (!objDados.HasRows)
                         {
-                            MessageBox.Show("Registro não encontrado!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Registro não encontrado!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             txtCodigo.Focus();
                         }
                         else
@@ -181,20 +219,29 @@ namespace wfaCRUD
                             strSQL += "agdemail = '" + txtEmail.Text + "',";
                             strSQL += "agdtelefone = '" + txtTelefone.Text + "',";
                             strSQL += "agdcpf = '" + txtCPF.Text + "'";
-                            strSQL += "where agdid = " + txtCodigo.Text.Trim();
+                            strSQL += "where ";
+
+                            if (campoPreenchidoId)
+                                strSQL += campoId;
+
+                            if (campoPreenchidoCpf && !campoPreenchidoId)
+                                strSQL += campoCpf;
+
+                            if (campoPreenchidoCpf && campoPreenchidoId)
+                                strSQL += " AND " + campoCpf;
 
                             objCommand.Connection = objConexao;
                             objCommand.CommandText = strSQL;
                             objCommand.ExecuteNonQuery();
 
-                            MessageBox.Show("Registro alterado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Registro alterado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao alterar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -216,24 +263,24 @@ namespace wfaCRUD
                 {
                     objConexao.Open();
 
-                    string strSQL = "delete from tblagenda where agdid =" + txtCodigo.Text.Trim();
+                    string strSQL = "delete from bdaula.tblagenda where agdid =" + txtCodigo.Text.Trim();
 
                     using (var objCommand = new MySqlCommand(strSQL, objConexao))
                     {
                         objCommand.ExecuteNonQuery();
 
-                        if (MessageBox.Show("Excluir o código selecionado", "Banco de Dados", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                        if (MessageBox.Show("Excluir o código selecionado", "Confirmação", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                         {
                             objCommand.ExecuteNonQuery();
 
-                            MessageBox.Show("Registro eliminado com sucesso!", "Banco de Dados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Registro eliminado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
                 }
             }
             catch (Exception erro)
             {
-                MessageBox.Show(erro.Message, "Erro ao excluir", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(erro.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
