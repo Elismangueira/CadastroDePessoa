@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -15,8 +16,7 @@ namespace wfaCRUD
 {
     public partial class frmBancoDados : Form
     {
-        string connectionString = "Server=192.168.10.101;Database=bdaula;user=root;password=9kjThhnVcXJP";
-        //string connectionString = "Server=sql111.infinityfree.com;Database=f0_39700899_cadastrodepessoa;user=if0_39700899;password=0URz1EHbRGhx";
+        string connectionString = ConfigurationManager.AppSettings["DatabaseConnectionString"];
 
         public frmBancoDados()
         {
