@@ -159,13 +159,14 @@ namespace wfaCRUD
                         else
                         {
                             objDados.Read();
+                            txtCodigo.Text = objDados["agdid"].ToString();
                             txtNome.Text = objDados["agdnome"].ToString();
                             txtEmail.Text = objDados["agdemail"].ToString();
                             txtTelefone.Text = objDados["agdtelefone"].ToString();
                             textBox1.Text = objDados["agdcpf"].ToString();
-                        }
 
-                        MessageBox.Show("Registro carregado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show("Registro carregado com sucesso!", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
                     }
                 }
             }
