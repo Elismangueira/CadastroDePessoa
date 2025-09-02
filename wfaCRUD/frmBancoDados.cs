@@ -219,7 +219,7 @@ namespace wfaCRUD
                             strSQL += "agdnome = '" + txtNome.Text + "',";
                             strSQL += "agdemail = '" + txtEmail.Text + "',";
                             strSQL += "agdtelefone = '" + txtTelefone.Text + "',";
-                            strSQL += "agdcpf = '" + txtCPF.Text + "'";
+                            strSQL += "agdcpf = '" + textBox1.Text + "'";
                             strSQL += "where ";
 
                             if (campoPreenchidoId)
