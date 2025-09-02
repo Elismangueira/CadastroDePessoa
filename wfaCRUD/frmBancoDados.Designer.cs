@@ -233,7 +233,7 @@
             this.labelVersao.Name = "labelVersao";
             this.labelVersao.Size = new System.Drawing.Size(157, 16);
             this.labelVersao.TabIndex = 12;
-            this.labelVersao.Text = "Versão: 2025-09-02-11-00";
+            this.labelVersao.Text = "Versão: 2025-09-02-16-00";
             // 
             // txtTelefone
             // 
