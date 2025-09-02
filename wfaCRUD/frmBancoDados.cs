@@ -43,6 +43,17 @@ namespace wfaCRUD
             Application.Exit();
         }
 
+        private bool ValidarCamposCodigoOuCpf()
+        {
+            if (String.IsNullOrEmpty(txtCodigo.Text) && String.IsNullOrEmpty(textBox1.Text))
+            {
+                MessageBox.Show("Campo código ou cpf devem ser preenchido!!!", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
+        }
+
 
         private bool ValidarCamposDeDados()
         {
@@ -95,7 +106,7 @@ namespace wfaCRUD
                 MessageBox.Show("Usuário já existe no sistema.", "Validação de dados", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-                
+
 
             try
             {
@@ -124,6 +135,9 @@ namespace wfaCRUD
 
         private void btnConsultar_Click(object sender, EventArgs e)
         {
+            if (!ValidarCamposCodigoOuCpf())
+                return;
+
             try
             {
                 using (var objConexao = new MySqlConnection(connectionString))
@@ -178,6 +192,9 @@ namespace wfaCRUD
 
         private void btnAlterar_Click(object sender, EventArgs e)
         {
+            if (!ValidarCamposCodigoOuCpf())
+                return;
+
             try
             {
                 using (var objConexao = new MySqlConnection(connectionString))
@@ -258,6 +275,9 @@ namespace wfaCRUD
 
         private void btnExcluir_Click(object sender, EventArgs e)
         {
+            if (!ValidarCamposCodigoOuCpf())
+                return;
+
             try
             {
                 using (var objConexao = new MySqlConnection(connectionString))
