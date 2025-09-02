@@ -87,6 +87,17 @@ namespace wfaCRUD
             return Regex.IsMatch(email, pattern);
         }
 
+        public static bool IsValidTelefone (string telefone)
+        {
+            if (string.IsNullOrWhiteSpace(telefone))
+            {
+                return false;
+            }
+
+            string pattern = @"/d";
+            return Regex.IsMatch(telefone, pattern);
+        }
+
         public static bool IsValidCpf(string cpf)
         {
             int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
